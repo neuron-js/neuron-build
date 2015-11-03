@@ -11,7 +11,7 @@
 
 # neuron-build
 
-<!-- description -->
+Neuron command to build a package.
 
 ## Install
 
@@ -22,7 +22,11 @@ $ npm install neuron-build --save
 ## Usage
 
 ```js
-var neuron_build = require('neuron-build');
+var build = require('neuron-build');
+build(cwd, {
+  root: '/path/to/workspace',
+  dest: '/path/to/built'
+}, callback)
 ```
 
 ## License

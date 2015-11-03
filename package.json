@@ -24,5 +24,15 @@
   "devDependencies": {
     "mocha": "*",
     "chai": "*"
+  },
+  "dependencies": {
+    "async": "^1.5.0",
+    "fs-expand": "^1.0.0",
+    "fs-extra": "^0.26.2",
+    "graceful-fs": "^4.1.2",
+    "neuron-builder": "^5.0.0",
+    "neuron-jade-compiler": "^1.0.6",
+    "neuron-json": "^1.0.2",
+    "neuron-stylus-compiler": "^1.0.0"
   }
 }
