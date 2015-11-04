@@ -1,6 +1,6 @@
 {
   "name": "neuron-build",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "neuron-build",
   "main": "index.js",
   "scripts": {
@@ -32,6 +32,7 @@
     "graceful-fs": "^4.1.2",
     "neuron-builder": "^5.0.0",
     "neuron-jade-compiler": "^1.0.6",
+    "neuron-ejs-compiler": "^1.0.0",
     "neuron-json": "^1.0.2",
     "neuron-stylus-compiler": "^1.0.0"
   }

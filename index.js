@@ -7,6 +7,7 @@ var nj = require('neuron-json');
 var fse = require('fs-extra');
 var node_path = require('path');
 var jade_compiler = require('neuron-jade-compiler');
+var ejs_compiler = require('neuron-ejs-compiler');
 var stylus_compiler = require('neuron-stylus-compiler');
 var expand = require('fs-expand');
 var fs = require('graceful-fs');
@@ -16,6 +17,10 @@ var async = require('async');
 // @param {Object} options
 function build (cwd, dest, callback) {
   nj.read(cwd, function (err, pkg) {
+    if (err) {
+      return callback(err);
+    }
+
     async.parallel([
       function (done) {
         build.entries(cwd, dest, pkg, done);
@@ -48,6 +53,10 @@ build.entries = function (cwd, dest, pkg, callback) {
         {
           test: '.jade',
           compiler: jade_compiler
+        },
+        {
+          test: '.ejs',
+          compiler: ejs_compiler
         }
       ]
     }, function (err, content) {
