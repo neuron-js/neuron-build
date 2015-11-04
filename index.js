@@ -55,7 +55,11 @@ build.entries = function (cwd, dest, pkg, callback) {
         return done(err);
       }
 
-      var output_dest = node_path.join(dest, entry);
+      var basename = entry === pkg.main
+        ? pkg.name + '.js'
+        : entry;
+
+      var output_dest = node_path.join(dest, pkg.version, basename);
       fse.outputFile(output_dest, content, done);
     });
 
@@ -86,7 +90,7 @@ build.css = function (cwd, dest, pkg, callback) {
       var origin = node_path.join(cwd, css);
       var output_dest = !is_stylus
         ? node_path.join(dest, css)
-        : node_path.join(dest, css.replace(/\.styl$/, '.css'));
+        : node_path.join(dest, pkg.version, css.replace(/\.styl$/, '.css'));
 
       if (!is_stylus) {
         return fse.copy(origin, output_dest, done);
