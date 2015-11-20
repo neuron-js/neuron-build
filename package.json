@@ -1,6 +1,6 @@
 {
   "name": "neuron-build",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "neuron-build",
   "main": "index.js",
   "scripts": {

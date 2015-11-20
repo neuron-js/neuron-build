@@ -98,7 +98,7 @@ build.css = function (cwd, dest, pkg, callback) {
       var is_stylus = extname === '.styl';
       var origin = node_path.join(cwd, css);
       var output_dest = !is_stylus
-        ? node_path.join(dest, css)
+        ? node_path.join(dest, pkg.version, css)
         : node_path.join(dest, pkg.version, css.replace(/\.styl$/, '.css'));
 
       if (!is_stylus) {
