@@ -14,8 +14,15 @@ var fs = require('graceful-fs');
 var async = require('async');
 
 
+function default_write (file, content, callback) {
+  fse.outputFile(file, content, callback);
+}
+
+
 // @param {Object} options
-function build (cwd, dest, callback) {
+function build (cwd, dest, callback, write) {
+  write = write || default_write;
+
   nj.read(cwd, function (err, pkg) {
     if (err) {
       return callback(err);
@@ -23,11 +30,11 @@ function build (cwd, dest, callback) {
 
     async.parallel([
       function (done) {
-        build.entries(cwd, dest, pkg, done);
+        build.entries(cwd, dest, pkg, done, write);
       },
 
       function (done) {
-        build.css(cwd, dest, pkg, done);
+        build.css(cwd, dest, pkg, done, write);
       }
     ], function (err) {
       callback(err);
@@ -36,7 +43,7 @@ function build (cwd, dest, callback) {
 }
 
 
-build.entries = function (cwd, dest, pkg, callback) {
+build.entries = function (cwd, dest, pkg, callback, write) {
   var entries = pkg.entries
     .concat(pkg.main)
     .filter(function (entry) {
@@ -69,14 +76,14 @@ build.entries = function (cwd, dest, pkg, callback) {
         : entry;
 
       var output_dest = node_path.join(dest, pkg.version, basename);
-      fse.outputFile(output_dest, content, done);
+      write(output_dest, content, done);
     });
 
   }, callback);
 };
 
 
-build.css = function (cwd, dest, pkg, callback) {
+build.css = function (cwd, dest, pkg, callback, write) {
   // Only build the first level of css files
   expand([
     '*.styl', 
@@ -117,10 +124,9 @@ build.css = function (cwd, dest, pkg, callback) {
             return done(err);
           }
 
-          fse.outputFile(output_dest, result.content, done);
+          write(output_dest, result.content, done);
         });
       });
     }, callback);
-
   });
 };
