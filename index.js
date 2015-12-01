@@ -2,7 +2,7 @@
 
 module.exports = build;
 
-var builder = require('neuron-builder');
+var builder = require('neuron-module-builder');
 var nj = require('neuron-json');
 var fse = require('fs-extra');
 var node_path = require('path');
