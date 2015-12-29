@@ -90,7 +90,8 @@ build.css = function (cwd, dest, pkg, callback, write) {
     '*.css', 
     '**/*.png',
     '**/*.jpg',
-    '**/*.gif'
+    '**/*.gif',
+    '**/*.html'
   ], {
     cwd: cwd
   }, function (err, files) {
