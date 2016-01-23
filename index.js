@@ -86,8 +86,8 @@ build.entries = function (cwd, dest, pkg, callback, write) {
 build.css = function (cwd, dest, pkg, callback, write) {
   // Only build the first level of css files
   expand([
-    '*.styl', 
-    '*.css', 
+    '**/*.styl',
+    '**/*.css',
     '**/*.png',
     '**/*.jpg',
     '**/*.gif',
