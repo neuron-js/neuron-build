@@ -1,86 +1,75 @@
-'use strict';
+'use strict'
 
-module.exports = build;
+module.exports = build
 
-var builder = require('neuron-module-builder');
-var nj = require('neuron-json');
-var fse = require('fs-extra');
-var node_path = require('path');
-var jade_compiler = require('neuron-jade-compiler');
-var ejs_compiler = require('neuron-ejs-compiler');
-var stylus_compiler = require('neuron-stylus-compiler');
-var expand = require('fs-expand');
-var fs = require('graceful-fs');
-var async = require('async');
+var builder = require('neuron-module-builder')
+var nj = require('neuron-json')
+var fse = require('fs-extra')
+var node_path = require('path')
+var expand = require('fs-expand')
+var fs = require('graceful-fs')
+var async = require('async')
 
 
 function default_write (file, content, callback) {
-  fse.outputFile(file, content, callback);
+  fse.outputFile(file, content, callback)
 }
 
 
 // @param {Object} options
-function build (cwd, dest, callback, write) {
-  write = write || default_write;
+function build (cwd, dest, compilers, callback, write) {
+  write = write || default_write
 
   nj.read(cwd, function (err, pkg) {
     if (err) {
-      return callback(err);
+      return callback(err)
     }
 
     async.parallel([
       function (done) {
-        build.entries(cwd, dest, pkg, done, write);
+        build.entries(cwd, dest, compilers, pkg, done, write)
       },
 
       function (done) {
-        build.css(cwd, dest, pkg, done, write);
+        build.css(cwd, dest, pkg, done, write)
       }
     ], function (err) {
-      callback(err);
-    });
-  });
+      callback(err)
+    })
+  })
 }
 
 
-build.entries = function (cwd, dest, pkg, callback, write) {
+build.entries = function (cwd, dest, compilers, pkg, callback, write) {
   var entries = pkg.entries
     .concat(pkg.main)
     .filter(function (entry) {
-      return entry;
-    });
+      return entry
+    })
 
   async.each(entries, function (entry, done) {
-    var file = node_path.join(cwd, entry);
+    var file = node_path.join(cwd, entry)
     builder(file, {
       pkg: pkg,
       cwd: cwd,
       allow_implicit_dependencies: true,
-      compilers: [
-        {
-          test: '.jade',
-          compiler: jade_compiler
-        },
-        {
-          test: '.ejs',
-          compiler: ejs_compiler
-        }
-      ]
+      compilers: compilers
+
     }, function (err, content) {
       if (err) {
-        return done(err);
+        return done(err)
       }
 
       var basename = entry === pkg.main
         ? pkg.name + '.js'
-        : entry;
+        : entry
 
-      var output_dest = node_path.join(dest, pkg.version, basename);
-      write(output_dest, content, done);
-    });
+      var output_dest = node_path.join(dest, pkg.version, basename)
+      write(output_dest, content, done)
+    })
 
-  }, callback);
-};
+  }, callback)
+}
 
 
 build.css = function (cwd, dest, pkg, callback, write) {
@@ -96,38 +85,38 @@ build.css = function (cwd, dest, pkg, callback, write) {
     cwd: cwd
   }, function (err, files) {
     if (err) {
-      return callback(err);
+      return callback(err)
     }
 
-    var csses = files.concat(pkg.css);
+    var csses = files.concat(pkg.css)
 
     async.each(csses, function (css, done) {
-      var extname = node_path.extname(css);
-      var is_stylus = extname === '.styl';
-      var origin = node_path.join(cwd, css);
+      var extname = node_path.extname(css)
+      var is_stylus = extname === '.styl'
+      var origin = node_path.join(cwd, css)
       var output_dest = !is_stylus
         ? node_path.join(dest, pkg.version, css)
-        : node_path.join(dest, pkg.version, css.replace(/\.styl$/, '.css'));
+        : node_path.join(dest, pkg.version, css.replace(/\.styl$/, '.css'))
 
       if (!is_stylus) {
-        return fse.copy(origin, output_dest, done);
+        return fse.copy(origin, output_dest, done)
       }
 
       fs.readFile(origin, function (err, content) {
         if (err) {
-          return done(err);
+          return done(err)
         }
 
         stylus_compiler(content.toString(), {
           filename: origin
         }, function (err, result) {
           if (err) {
-            return done(err);
+            return done(err)
           }
 
-          write(output_dest, result.content, done);
-        });
-      });
-    }, callback);
-  });
-};
+          write(output_dest, result.content, done)
+        })
+      })
+    }, callback)
+  })
+}
