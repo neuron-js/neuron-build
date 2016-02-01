@@ -18,7 +18,7 @@ function default_write (file, content, callback) {
 
 
 // @param {Object} options
-function build (cwd, dest, compilers, callback, write) {
+function build (cwd, dest, options, callback, write) {
   write = write || default_write
 
   nj.read(cwd, function (err, pkg) {
@@ -28,7 +28,7 @@ function build (cwd, dest, compilers, callback, write) {
 
     async.parallel([
       function (done) {
-        build.entries(cwd, dest, compilers, pkg, done, write)
+        build.entries(cwd, dest, options, pkg, done, write)
       },
 
       function (done) {
@@ -41,7 +41,7 @@ function build (cwd, dest, compilers, callback, write) {
 }
 
 
-build.entries = function (cwd, dest, compilers, pkg, callback, write) {
+build.entries = function (cwd, dest, options, pkg, callback, write) {
   var entries = pkg.entries
     .concat(pkg.main)
     .filter(function (entry) {
@@ -54,7 +54,8 @@ build.entries = function (cwd, dest, compilers, pkg, callback, write) {
       pkg: pkg,
       cwd: cwd,
       allow_implicit_dependencies: true,
-      compilers: compilers
+      compilers: options.compilers || [],
+      babel: options.babel
 
     }, function (err, content) {
       if (err) {
