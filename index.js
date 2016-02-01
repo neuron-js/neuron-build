@@ -9,6 +9,7 @@ var node_path = require('path')
 var expand = require('fs-expand')
 var fs = require('graceful-fs')
 var async = require('async')
+var stylus_compiler = require('neuron-stylus-compiler')
 
 
 function default_write (file, content, callback) {
