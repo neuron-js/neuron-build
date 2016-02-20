@@ -10,6 +10,7 @@ var expand = require('fs-expand')
 var fs = require('graceful-fs')
 var async = require('async')
 var stylus_compiler = require('neuron-stylus-compiler')
+var mix = require('mix2')
 
 
 function default_write (file, content, callback) {
@@ -32,7 +33,7 @@ function build (cwd, dest, options, callback, write) {
       },
 
       function (done) {
-        build.css(cwd, dest, pkg, done, write)
+        build.css(cwd, dest, options, pkg, done, write)
       }
     ], function (err) {
       callback(err)
@@ -74,7 +75,7 @@ build.entries = function (cwd, dest, options, pkg, callback, write) {
 }
 
 
-build.css = function (cwd, dest, pkg, callback, write) {
+build.css = function (cwd, dest, options, pkg, callback, write) {
   // Only build the first level of css files
   expand([
     '**/*.styl',
@@ -91,6 +92,7 @@ build.css = function (cwd, dest, pkg, callback, write) {
     }
 
     var csses = files.concat(pkg.css)
+    var stylus_compiler = build._get_stylus_compiler(options)
 
     async.each(csses, function (css, done) {
       var extname = node_path.extname(css)
@@ -109,16 +111,42 @@ build.css = function (cwd, dest, pkg, callback, write) {
           return done(err)
         }
 
-        stylus_compiler(content.toString(), {
+        var stylus_options = mix({
           filename: origin
-        }, function (err, result) {
-          if (err) {
-            return done(err)
-          }
+        }, stylus_compiler.options, false)
 
-          write(output_dest, result.content, done)
-        })
+        stylus_compiler.compiler(
+          content.toString(),
+          stylus_options,
+            function (err, result) {
+            if (err) {
+              return done(err)
+            }
+
+            write(output_dest, result.content, done)
+          }
+        )
       })
     }, callback)
   })
+}
+
+
+build._get_stylus_compiler = function (options) {
+  var compilers = options.compilers || []
+  var found
+  compilers.some(function (compiler) {
+    if (compiler.test && compiler.test.test('.styl')) {
+      found = compiler
+      return true
+    }
+  })
+
+  found = found || {
+    compiler: stylus_compiler
+  }
+
+  found.options = found.options || {}
+
+  return found
 }

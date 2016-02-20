@@ -1,7 +1,7 @@
 {
   "name": "neuron-build",
-  "version": "2.0.2",
-  "description": "neuron-build",
+  "version": "2.1.0",
+  "description": "Build a neuron package",
   "main": "index.js",
   "scripts": {
     "test": "mocha --reporter spec ./test/*.js"
@@ -11,7 +11,8 @@
     "url": "git://github.com/neuron-js/neuron-build.git"
   },
   "keywords": [
-    "neuron-build"
+    "neuron-build",
+    "build"
   ],
   "engines": {
     "node": ">=0.10.0"
@@ -30,10 +31,9 @@
     "fs-expand": "^1.0.0",
     "fs-extra": "^0.26.2",
     "graceful-fs": "^4.1.2",
-    "neuron-module-builder": "^6.0.0",
-    "neuron-jade-compiler": "^1.0.6",
-    "neuron-ejs-compiler": "^1.0.0",
+    "mix2": "^1.0.1",
     "neuron-json": "^1.0.2",
+    "neuron-module-builder": "^6.0.0",
     "neuron-stylus-compiler": "^1.0.0"
   }
 }
