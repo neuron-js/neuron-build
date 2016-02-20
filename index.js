@@ -148,5 +148,8 @@ build._get_stylus_compiler = function (options) {
 
   found.options = found.options || {}
 
+  // Method to resolve relative paths
+  found.options.resolve = options.resolve
+
   return found
 }
