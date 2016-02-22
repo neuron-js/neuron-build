@@ -43,6 +43,11 @@ function build (cwd, dest, options, callback, write) {
 
 
 build.entries = function (cwd, dest, options, pkg, callback, write) {
+  if (pkg.dist) {
+    return build.dist(cwd, dest, pkg, callback, write)
+  }
+
+
   var entries = pkg.entries
     .concat(pkg.main)
     .filter(function (entry) {
@@ -72,6 +77,19 @@ build.entries = function (cwd, dest, options, pkg, callback, write) {
     })
 
   }, callback)
+}
+
+
+build.dist = function (cwd, dest, pkg, callback, write) {
+  var from = node_path.join(cwd, pkg.dist)
+  var to = node_path.join(dest, pkg.version, pkg.dist)
+  fs.readFile(from, function (err, content) {
+    if (err) {
+      return callback(err)
+    }
+
+    write(to, content.toString(), callback)
+  })
 }
 
 
