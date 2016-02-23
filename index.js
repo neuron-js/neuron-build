@@ -81,15 +81,18 @@ build.entries = function (cwd, dest, options, pkg, callback, write) {
 
 
 build.dist = function (cwd, dest, pkg, callback, write) {
-  var from = node_path.join(cwd, pkg.dist)
-  var to = node_path.join(dest, pkg.version, pkg.dist)
-  fs.readFile(from, function (err, content) {
-    if (err) {
-      return callback(err)
-    }
+  async.each(pkg.dist, function (dist) {
+    var from = node_path.join(cwd, dist)
+    var to = node_path.join(dest, pkg.version, dist)
+    fs.readFile(from, function (err, content) {
+      if (err) {
+        return callback(err)
+      }
 
-    write(to, content.toString(), callback)
-  })
+      write(to, content.toString(), callback)
+    })
+
+  }, callback)
 }
 
 
