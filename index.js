@@ -104,7 +104,13 @@ build.css = function (cwd, dest, options, pkg, callback, write) {
     '**/*.png',
     '**/*.jpg',
     '**/*.gif',
-    '**/*.html'
+    '**/*.html',
+    '**/*.eot',
+    '**/*.svg',
+    '**/*.ttf',
+    '**/*.woff',
+    '**/*.woff2',
+    '**/*.otf'
   ], {
     cwd: cwd
   }, function (err, files) {
