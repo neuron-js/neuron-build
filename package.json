@@ -29,7 +29,7 @@
   "dependencies": {
     "async": "^1.5.2",
     "fs-expand": "^1.0.0",
-    "fs-extra": "^0.26.2",
+    "fs-extra": "^0.30.0",
     "graceful-fs": "^4.1.2",
     "minimatch": "^3.0.0",
     "mix2": "^1.0.1",

@@ -129,7 +129,14 @@ build.resources = function (cwd, dest, options, pkg, callback, write) {
 
       if (!compiler) {
         var output_dest = get_output_dest(file)
-        return fse.copy(origin, output_dest, done)
+        try {
+          fse.copySync(origin, output_dest)
+        } catch (e) {
+          return done(e)
+        }
+
+        return done(null)
+        // return fse.copy(origin, output_dest, done)
       }
 
       fs.readFile(origin, function (err, content) {
@@ -144,7 +151,7 @@ build.resources = function (cwd, dest, options, pkg, callback, write) {
         compiler.compiler(
           content.toString(),
           compiler_options,
-            function (err, result) {
+          function (err, result) {
             if (err) {
               return done(err)
             }
@@ -158,7 +165,13 @@ build.resources = function (cwd, dest, options, pkg, callback, write) {
           }
         )
       })
-    }, callback)
+    }, function (err){
+      if (err) {
+        return callback(err[0])
+      }
+
+      callback(null)
+    })
   })
 }
 
