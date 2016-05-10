@@ -9,9 +9,9 @@ var node_path = require('path')
 var expand = require('fs-expand')
 var fs = require('graceful-fs')
 var async = require('async')
-var stylus_compiler = require('neuron-stylus-compiler')
 var mix = require('mix2')
-
+var minimatch = require('minimatch')
+var util = require('util')
 
 function default_write (file, content, callback) {
   fse.outputFile(file, content, callback)
@@ -21,6 +21,15 @@ function default_write (file, content, callback) {
 // @param {Object} options
 function build (cwd, dest, options, callback, write) {
   write = write || default_write
+
+  options.compilers = options.compilers || []
+  options.compilers.forEach(function (compiler){
+    var test = compiler.test
+
+    if (util.isString(test)){
+      compiler.test = minimatch.makeRe(test)
+    }
+  })
 
   nj.read(cwd, function (err, pkg) {
     if (err) {
@@ -33,7 +42,7 @@ function build (cwd, dest, options, callback, write) {
       },
 
       function (done) {
-        build.css(cwd, dest, options, pkg, done, write)
+        build.resources(cwd, dest, options, pkg, done, write)
       }
     ], function (err) {
       callback(err)
@@ -43,10 +52,9 @@ function build (cwd, dest, options, callback, write) {
 
 
 build.entries = function (cwd, dest, options, pkg, callback, write) {
-  if (pkg.dist) {
+  if (pkg.dist.length) {
     return build.dist(cwd, dest, pkg, callback, write)
   }
-
 
   var entries = pkg.entries
     .concat(pkg.main)
@@ -84,6 +92,7 @@ build.dist = function (cwd, dest, pkg, callback, write) {
   async.each(pkg.dist, function (dist) {
     var from = node_path.join(cwd, dist)
     var to = node_path.join(dest, pkg.version, dist)
+
     fs.readFile(from, function (err, content) {
       if (err) {
         return callback(err)
@@ -96,21 +105,15 @@ build.dist = function (cwd, dest, pkg, callback, write) {
 }
 
 
-build.css = function (cwd, dest, options, pkg, callback, write) {
+build.resources = function (cwd, dest, options, pkg, callback, write) {
+  function get_output_dest (file) {
+    return node_path.join(dest, pkg.version, file)
+  }
+
   // Only build the first level of css files
   expand([
-    '**/*.styl',
-    '**/*.css',
-    '**/*.png',
-    '**/*.jpg',
-    '**/*.gif',
-    '**/*.html',
-    '**/*.eot',
-    '**/*.svg',
-    '**/*.ttf',
-    '**/*.woff',
-    '**/*.woff2',
-    '**/*.otf'
+    '**',
+    '!**/*.js'
   ], {
     cwd: cwd
   }, function (err, files) {
@@ -118,18 +121,14 @@ build.css = function (cwd, dest, options, pkg, callback, write) {
       return callback(err)
     }
 
-    var csses = files.concat(pkg.css)
-    var stylus_compiler = build._get_stylus_compiler(options)
+    files = files.concat(pkg.css)
 
-    async.each(csses, function (css, done) {
-      var extname = node_path.extname(css)
-      var is_stylus = extname === '.styl'
-      var origin = node_path.join(cwd, css)
-      var output_dest = !is_stylus
-        ? node_path.join(dest, pkg.version, css)
-        : node_path.join(dest, pkg.version, css.replace(/\.styl$/, '.css'))
+    async.each(files, function (file, done) {
+      var origin = node_path.join(cwd, file)
+      var compiler = build._get_compiler(file, options)
 
-      if (!is_stylus) {
+      if (!compiler) {
+        var output_dest = get_output_dest(file)
         return fse.copy(origin, output_dest, done)
       }
 
@@ -138,18 +137,23 @@ build.css = function (cwd, dest, options, pkg, callback, write) {
           return done(err)
         }
 
-        var stylus_options = mix({
+        var compiler_options = mix({
           filename: origin
-        }, stylus_compiler.options, false)
+        }, compiler.options, false)
 
-        stylus_compiler.compiler(
+        compiler.compiler(
           content.toString(),
-          stylus_options,
+          compiler_options,
             function (err, result) {
             if (err) {
               return done(err)
             }
 
+            if (result.extname) {
+              file = file.replace(/\.[^.]+$/, result.extname)
+            }
+
+            var output_dest = get_output_dest(file)
             write(output_dest, result.content, done)
           }
         )
@@ -159,18 +163,19 @@ build.css = function (cwd, dest, options, pkg, callback, write) {
 }
 
 
-build._get_stylus_compiler = function (options) {
-  var compilers = options.compilers || []
+build._get_compiler = function (path, options) {
+  var compilers = options.compilers
   var found
+
   compilers.some(function (compiler) {
-    if (compiler.test && compiler.test.test('.styl')) {
+    if (compiler.test && compiler.test.test(path)) {
       found = compiler
       return true
     }
   })
 
-  found = found || {
-    compiler: stylus_compiler
+  if (!found) {
+    return
   }
 
   found.options = found.options || {}

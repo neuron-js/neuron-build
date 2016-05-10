@@ -1,6 +1,6 @@
 {
   "name": "neuron-build",
-  "version": "2.4.1",
+  "version": "2.6.0",
   "description": "Build a neuron package",
   "main": "index.js",
   "scripts": {
@@ -27,13 +27,13 @@
     "chai": "*"
   },
   "dependencies": {
-    "async": "^1.5.0",
+    "async": "^1.5.2",
     "fs-expand": "^1.0.0",
     "fs-extra": "^0.26.2",
     "graceful-fs": "^4.1.2",
+    "minimatch": "^3.0.0",
     "mix2": "^1.0.1",
-    "neuron-json": "^1.0.2",
-    "neuron-module-builder": "^6.0.0",
-    "neuron-stylus-compiler": "^1.0.0"
+    "neuron-json": "^2.0.0",
+    "neuron-module-builder": "^6.0.0"
   }
 }
