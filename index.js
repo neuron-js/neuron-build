@@ -22,15 +22,6 @@ function default_write (file, content, callback) {
 function build (cwd, dest, options, callback, write) {
   write = write || default_write
 
-  options.compilers = options.compilers || []
-  options.compilers.forEach(function (compiler){
-    var test = compiler.test
-
-    if (util.isString(test)){
-      compiler.test = minimatch.makeRe(test)
-    }
-  })
-
   nj.read(cwd, function (err, pkg) {
     if (err) {
       return callback(err)
