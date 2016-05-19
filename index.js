@@ -101,11 +101,19 @@ build.resources = function (cwd, dest, options, pkg, callback, write) {
     return node_path.join(dest, pkg.version, file)
   }
 
+  var include = options.include || ['**']
+  var exclude = options.exclude || []
+
+  var patterns = []
+  .concat(include)
+  .concat(exclude.map(function(pattern){
+    return '!' + pattern
+  }))
+
+  patterns.push('!**/*.js')
+
   // Only build the first level of css files
-  expand([
-    '**',
-    '!**/*.js'
-  ], {
+  expand(patterns, {
     cwd: cwd,
     filter: 'isFile'
 
