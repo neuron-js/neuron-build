@@ -106,7 +106,9 @@ build.resources = function (cwd, dest, options, pkg, callback, write) {
     '**',
     '!**/*.js'
   ], {
-    cwd: cwd
+    cwd: cwd,
+    filter: 'isFile'
+
   }, function (err, files) {
     if (err) {
       return callback(err)
@@ -172,7 +174,11 @@ build._get_compiler = function (path, options) {
   var found
 
   compilers.some(function (compiler) {
-    if (compiler.test && compiler.test.test(path)) {
+    if (
+      !compiler.requireOnly
+      && compiler.test
+      && compiler.test.test(path)
+    ) {
       found = compiler
       return true
     }
