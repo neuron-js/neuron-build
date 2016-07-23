@@ -1,6 +1,6 @@
 {
   "name": "neuron-build",
-  "version": "2.8.0",
+  "version": "2.9.0",
   "description": "Build a neuron package",
   "main": "index.js",
   "scripts": {
@@ -34,6 +34,6 @@
     "minimatch": "^3.0.0",
     "mix2": "^1.0.1",
     "neuron-json": "^2.0.0",
-    "neuron-module-builder": "^6.0.0"
+    "neuron-module-builder": "^7.0.0"
   }
 }
