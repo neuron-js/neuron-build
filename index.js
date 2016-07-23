@@ -130,14 +130,7 @@ build.resources = function (cwd, dest, options, pkg, callback, write) {
 
       if (!compiler) {
         var output_dest = get_output_dest(file)
-        try {
-          fse.copySync(origin, output_dest)
-        } catch (e) {
-          return done(e)
-        }
-
-        return done(null)
-        // return fse.copy(origin, output_dest, done)
+        return fse.copy(origin, output_dest, done)
       }
 
       fs.readFile(origin, function (err, content) {
