@@ -161,7 +161,7 @@ build.resources = function (cwd, dest, options, pkg, callback, write) {
       })
     }, function (err){
       if (err) {
-        return callback(err[0])
+        return callback(err)
       }
 
       callback(null)
