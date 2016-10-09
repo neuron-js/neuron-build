@@ -60,7 +60,8 @@ build.entries = function (cwd, dest, options, pkg, callback, write) {
       cwd: cwd,
       allow_implicit_dependencies: true,
       compilers: options.compilers || [],
-      babel: options.babel
+      babel: options.babel,
+      parseAST: options.parseAST
 
     }, function (err, content) {
       if (err) {
